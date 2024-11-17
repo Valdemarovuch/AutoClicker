@@ -14,12 +14,17 @@ class AutoClicker(threading.Thread):
         self.button = button
         self.running = False
         self.program_running = True
+        self._stop_event = threading.Event()
 
     def start_clicking(self):
-        self.running = True
+        if not self.running:
+            self.running = True
+            self._stop_event.clear()
 
     def stop_clicking(self):
-        self.running = False
+        if self.running:
+            self.running = False
+            self._stop_event.set()
 
     def exit(self):
         self.stop_clicking()
@@ -27,23 +32,31 @@ class AutoClicker(threading.Thread):
 
     def run(self):
         while self.program_running:
-            while self.running:
+            if self.running:
                 pyautogui.click(button=self.button)
-            time.sleep(0.1)
+                # Затримка для зменшення навантаження
+                time.sleep(0.05)
+            else:
+                # Підвищуємо ефективність, чекаючи поки не почнеться клік
+                self._stop_event.wait()
 
 def on_press(key):
-    if key == start_stop_key:
-        if click_thread.running:
-            click_thread.stop_clicking()
-        else:
-            click_thread.start_clicking()
-    elif key == exit_key:
-        click_thread.exit()
-        return False
+    try:
+        if key == start_stop_key:
+            if click_thread.running:
+                click_thread.stop_clicking()
+            else:
+                click_thread.start_clicking()
+        elif key == exit_key:
+            click_thread.exit()
+            return False
+    except AttributeError:
+        pass
 
 if __name__ == "__main__":
     click_thread = AutoClicker(button)
     click_thread.start()
 
+    # Логування стану натискання клавіші
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
