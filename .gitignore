@@ -1,0 +1,24 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environments (Віртуальне середовище) ---
+venv/
+env/
+.venv/
+.env
+
+# --- IDE Settings (Налаштування редакторів коду) ---
+.vscode/
+.idea/
+*.swp
+
+# --- Distribution / PyInstaller (Якщо будеш компілювати в .exe) ---
+build/
+dist/
+*.spec
+
+# --- OS Specific (Системні файли) ---
+.DS_Store
+Thumbs.db
